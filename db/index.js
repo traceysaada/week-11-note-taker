@@ -34,17 +34,28 @@ class DatabaseFunction {
     if (!title || !text) {
       throw new Error("Note 'title' and 'text' cannot be blank");
     }
-    const newNote = { title, text, id };
+    const newNote = { title, text };
     return this.getNotes()
-      .then((notes) => [...notes, newNote])
+      .then((notes) =>{
+        if(notes.length === 0) {
+          newNote.id = 0;
+        } else {
+          newNote.id = notes[notes.length-1].id + 1;
+        }
+        return [...notes, newNote]
+        })
       .then((updatedNotes) => this.write(updatedNotes))
       .then(() => newNote);
   }
 
-  deleteNote(id) {
+  removeNote(id) {
     return this.getNotes()
-      .then((notes) => notes.filter((note) => note.id !== id))
-      .then((filteredNotes) => this.write(filteredNotes));
+      .then((notes) => {
+        const filteredNotes = notes.filter((note) => note.id !== id);
+        console.log(filteredNotes)
+        this.write(filteredNotes);
+      })
+      // .then((filteredNotes) => this.write(filteredNotes));
   }
 }
 
